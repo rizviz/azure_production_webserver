@@ -81,7 +81,7 @@ resource "azurerm_network_watcher" "nwatcher" {
 # Security Groups to allow for services to connect
 
 resource "azurerm_network_security_group" "inbound_ports" {
-  name                = "apiservices"
+  name                = "InboundNSG1"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 }
@@ -101,7 +101,20 @@ resource "azurerm_network_security_rule" "tcp_ports" {
    network_security_group_name = azurerm_network_security_group.inbound_ports.name
  }
 
-
+resource "azurerm_network_security_rule" "udp_ports" {
+    count = "${length(var.tcp_ports)}"
+    name                       = "sg-rule-${count.index}"
+    direction                  = "Inbound"
+    access                     = "Allow"
+    priority                   = "${(100 * (count.index + 1))}"
+    source_address_prefix      = "*"
+    source_port_range          = "*"
+    destination_address_prefix = "*"
+    destination_port_range     = "${element(var.udp_ports, count.index)}"
+    protocol                   = "UDP"
+    resource_group_name         = azurerm_resource_group.main.name
+    network_security_group_name = azurerm_network_security_group.inbound_ports.name
+  }
 
 
 resource "azurerm_network_interface_security_group_association" "web" {

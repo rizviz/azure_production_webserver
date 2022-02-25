@@ -13,5 +13,11 @@ variable "location" {
                "443",
                "8080",
                "8443"]
-  }
+ }
 
+# UDP Ports for Security Group Rules
+  variable "udp_ports" {
+     default = ["53",
+                "9090",
+                "9443"]
+   }
