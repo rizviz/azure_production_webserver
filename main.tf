@@ -80,11 +80,17 @@ resource "azurerm_network_watcher" "nwatcher" {
 
 # Security Groups to allow for services to connect
 
-resource "azurerm_network_security_group" "inbound_ports" {
+resource "azurerm_network_security_group" "inbound_tcp_ports" {
   name                = "InboundNSG1"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 }
+
+resource "azurerm_network_security_group" "inbound_udp_ports" {
+   name                = "InboundNSG2"
+   location            = azurerm_resource_group.main.location
+   resource_group_name = azurerm_resource_group.main.name
+ }
 
 resource "azurerm_network_security_rule" "tcp_ports" {
    count = "${length(var.tcp_ports)}"
@@ -98,7 +104,7 @@ resource "azurerm_network_security_rule" "tcp_ports" {
    destination_port_range     = "${element(var.tcp_ports, count.index)}"
    protocol                   = "TCP"
    resource_group_name         = azurerm_resource_group.main.name
-   network_security_group_name = azurerm_network_security_group.inbound_ports.name
+   network_security_group_name = azurerm_network_security_group.inbound_tcp_ports.name
  }
 
 resource "azurerm_network_security_rule" "udp_ports" {
@@ -113,14 +119,20 @@ resource "azurerm_network_security_rule" "udp_ports" {
     destination_port_range     = "${element(var.udp_ports, count.index)}"
     protocol                   = "UDP"
     resource_group_name         = azurerm_resource_group.main.name
-    network_security_group_name = azurerm_network_security_group.inbound_ports.name
+    network_security_group_name = azurerm_network_security_group.inbound_udp_ports.name
   }
 
 
-resource "azurerm_network_interface_security_group_association" "web" {
+resource "azurerm_network_interface_security_group_association" "web1" {
   network_interface_id      = azurerm_network_interface.ProdPubSubnet.id
-  network_security_group_id = azurerm_network_security_group.inbound_ports.id
+  network_security_group_id = azurerm_network_security_group.inbound_tcp_ports.id
 }
+
+resource "azurerm_network_interface_security_group_association" "web2" {
+   network_interface_id      = azurerm_network_interface.ProdPubSubnet.id
+   network_security_group_id = azurerm_network_security_group.inbound_udp_ports.id
+ }
+
 
 resource "azurerm_linux_virtual_machine" "main" {
   name                            = "${var.prefix}-vm"
