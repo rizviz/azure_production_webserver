@@ -123,10 +123,10 @@ resource "azurerm_network_security_rule" "udp_ports" {
   }
 
 
-resource "azurerm_network_interface_security_group_association" "web1" {
-  network_interface_id      = azurerm_network_interface.ProdPubSubnet.id
-  network_security_group_id = azurerm_network_security_group.inbound_tcp_ports.id
-}
+#resource "azurerm_network_interface_security_group_association" "web1" {
+#  network_interface_id      = azurerm_network_interface.ProdPubSubnet.id
+#  network_security_group_id = azurerm_network_security_group.inbound_tcp_ports.id
+#}
 
 resource "azurerm_network_interface_security_group_association" "web2" {
    network_interface_id      = azurerm_network_interface.ProdPubSubnet.id
@@ -140,7 +140,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   location                        = azurerm_resource_group.main.location
   size                            = "Standard_B1ms"
   admin_username                  = "adminuser"
-  admin_password                  = "P@ssw0rd1234!"
+  admin_password                  = "ChangeMeA$APRocky;)"
   disable_password_authentication = false
   network_interface_ids = [
     azurerm_network_interface.main.id,
@@ -162,6 +162,6 @@ resource "azurerm_linux_virtual_machine" "main" {
   os_disk {
     storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
-    disk_size_gb         = "20"
+    disk_size_gb         = "35"
   }
 }
